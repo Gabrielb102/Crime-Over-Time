@@ -1,0 +1,6 @@
+requirements.txt
+venv
+/static/__pycache__
+cache_1.sqlite
+__pycache__
+.DS_Store

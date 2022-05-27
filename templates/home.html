@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block body %}
+<div id="map-settings" class="content">
+    <label for="map-switch"> Regions/states
+        <input type="checkbox" id="map-switch">
+    </label>    
+</div>
+<div id="map"></div>
+<div id="form" class="content">
+    <form>
+        {{ form.hidden_tag() }}
+
+        {% for field in form if field.widget.input_type != 'hidden' %}
+        <p class="field">
+            {{ field.label }}
+            {{ field }}
+
+            {% for err in field.errors %}
+            <p class="error"> {{ err }} </p>
+            {% endfor %}
+
+        </p>
+        {% endfor %}
+        <button type="submit">Submit</button>
+    </form>
+</div>
+{% endblock %}
