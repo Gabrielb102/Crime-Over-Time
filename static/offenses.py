@@ -57,7 +57,7 @@ offenses = [
     'theft-from-motor-vehicle',
     'theft-of-motor-vehicle-parts-or-accessories',
     'theft-from-motor-vehicle',
-    'Tweapon-law-violation',
+    'weapon-law-violation',
     'welfare-fraud',
     'wire-fraud',
     'not-specified',

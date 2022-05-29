@@ -102,7 +102,7 @@ var regionsData = {
             {
             "type":"Feature","id":"03",
             "properties":{
-                "name":"northeast"
+                "name":"south"
                 },
                 "geometry":{
                     "type":"MultiPolygon",

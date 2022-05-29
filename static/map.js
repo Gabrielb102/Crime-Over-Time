@@ -28,7 +28,17 @@ L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_toke
 
 // STYLE FUNCTIONS ////////////////////////////////////////
 
-function stateStyle(feature) {
+const stateStyle = feature => {
+    if(feature.properties.name === locationField.value && !sessionStorage.getItem('zoom')) {
+        return {
+            weight: 3,
+            color: 'aquamarine',
+            fillColor: 'none',
+            dashArray: '',
+            fillOpacity: 0.0    
+        }
+    }
+
     return {
         fillColor: 'black',
         weight: 2,
@@ -39,7 +49,17 @@ function stateStyle(feature) {
     };
 }
 
-function regionStyle(feature) {
+const regionStyle = feature => {
+    if(feature.properties.name === locationField.value && !sessionStorage.getItem('zoom')) {
+        return {
+            weight: 3,
+            color: 'aquamarine',
+            fillColor: 'none',
+            dashArray: '',
+            fillOpacity: 0.0    
+        }
+    }
+
     return {
         fillColor: 'gray',
         weight: 2,
@@ -50,7 +70,7 @@ function regionStyle(feature) {
     };
 }
 
-function natStyle(feature) {
+const natStyle = feature => {
     return {
         fillColor: 'black',
         weight: 1,
@@ -63,9 +83,8 @@ function natStyle(feature) {
 
 // INDIVIDUAL LOCATION SELECTION FUNCTIONS/////////////////
 
-function highlightFeature(e) {
+const highlightFeature = e => {
     var feature = e.target;
-    
     if(locationField.value !== e.target['feature']['properties']['name']) {
         feature.setStyle({
             weight: 3,
@@ -80,19 +99,20 @@ function highlightFeature(e) {
     }
 }
 
-function resetHighlight(e) {
+const resetHighlight = e => {
     var feature = e.target;
 
     if(locationField.value !== feature['feature']['properties']['name']) {
-        layer.resetStyle(e.target);
+        layer.resetStyle(feature);
         feature.bringToBack()
     }
 }
 
-function zoomToFeature(e) {
-    layer.resetStyle();
+const zoomToFeature = e => {
+    sessionStorage.setItem('zoom', 1)
+    console.log('zoom')
     var feature = e.target;
-
+    layer.resetStyle(feature.map)
     feature.setStyle({
         weight: 3,
         color: 'aquamarine',
@@ -107,7 +127,7 @@ function zoomToFeature(e) {
     locationField.value = location
 }
 
-function onEachFeature(feature, layer) {
+const onEachFeature = (feature, layer) => {
     layer.on({
         mouseover: highlightFeature,
         mouseout: resetHighlight,
@@ -120,7 +140,7 @@ var natLayer = L.geoJson(statesData, {style: natStyle}).addTo(map);
 var stateLayer = L.geoJson(statesData, {style: stateStyle, onEachFeature: onEachFeature}).addTo(map); 
 var regionLayer = L.geoJson(regionsData, {style: regionStyle, onEachFeature: onEachFeature}).addTo(map);
 
-const mapCheck = function() {
+const mapCheck = () => {
     scope = scopeField.value
     if (scope === 'national') {
         layer = natLayer
@@ -141,8 +161,11 @@ const mapCheck = function() {
 }
 
 mapCheck()
+form.onchange = mapCheck;
+document.addEventListener('DOMContentLoaded', function() {
+    sessionStorage.removeItem('zoom')
+})
 
-form.addEventListener("change", mapCheck, false);
 
 // var marker = L.marker([51.5, -0.09]).addTo(map);
 

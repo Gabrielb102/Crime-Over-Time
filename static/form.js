@@ -1,4 +1,5 @@
 const form = document.querySelector('form')
+const offenseField = document.querySelector('#offense')
 const infoField = document.querySelector('#info')
 const dataField = document.querySelector('#data')
 const scopeField = document.querySelector('#scope')
@@ -53,6 +54,10 @@ const states = [
     [
         "CT",
         "Connecticut"
+    ],
+    [
+        "DC",
+        "District of Columbia"
     ],
     [
         "DE",
@@ -177,6 +182,10 @@ const states = [
     [
         "PA",
         "Pennsylvania"
+    ],
+    [
+        "PR",
+        "Puerto Rico"
     ],
     [
         "RI",

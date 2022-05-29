@@ -1,5 +1,4 @@
-from flask import Flask, request, flash, request, render_template, redirect, jsonify
-from flask_debugtoolbar import DebugToolbarExtension
+from flask import Flask, request, flash, request, render_template, redirect, jsonify, session
 from models import db, connect_db, User, Favorite, Query
 from forms import QueryForm, offenses_tuples
 from requests_cache import CachedSession
@@ -11,39 +10,61 @@ app.config['SECRET_KEY'] = "SECRET_KEY"
 app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql:///crime_over_time"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
-debug = DebugToolbarExtension(app)
-
 connect_db(app)
 
-session = CachedSession('cache_1', 'sqlite', 7776000)
+request_cache = CachedSession('cache_1', 'sqlite', 7776000)
 api_url = 'https://api.usa.gov/crime/fbi/sapi/'
 base_endpoint = 'api/data/nibrs/'
 headers = {'x-api-key': 'her0c01v93zfPIBouBZkcuHKyhshiZKsOC7d4VZh'}
 
-@app.route('/', methods=['GET', 'POST'])
+@app.route('/')
 def show_home():
     form = QueryForm()
-    offense = form.offense.data
-    info = form.info.data
-    scope = form.scope.data
-    location = form.location.data
-    variable = form.data.data
+    form.offense.data = session['offense'] if session.get('offense') else None
+    form.info.data = session['info'] if session.get('info') else None
+    form.scope.data = session['scope']  if session.get('scope') else None
+    form.location.data = session['location'] if session.get('location') else None
+    form.data.data = session['variable'] if session.get('variable') else None
     return render_template('home.html', form=form)
 
-@app.route('/results')
+@app.route('/results', methods=['POST'])
 def call_api():
     form = QueryForm()
-    offense = form.offense.data
-    info = form.info.data
-    scope = form.scope.data
-    location = form.location.data
-    variable = form.data.data
 
-    full_request_url = f"{api_url}{base_endpoint}{offense}/{info}/{scope}/{location}/{variable}"
-    print(full_request_url)
-    request = session.get(full_request_url, headers=headers)
+    if form.validate_on_submit():
+        session['offense'] = form.offense.data
+        session['info'] = form.info.data
+        session['scope'] = form.scope.data
+        session['location'] = form.location.data
+        session['variable'] = form.data.data
 
-    return jsonify(request.json)        
+        offense = form.offense.data
+        info = form.info.data
+        scope = form.scope.data
+        location = form.location.data
+        variable = form.data.data
+
+        full_request_url = f"{api_url}{base_endpoint}{offense}/{info}/{scope}/{location}/{variable}"
+        print(full_request_url)
+        request = request_cache.get(full_request_url, headers=headers)
+        request_json = request.json
+
+        return render_template('results.html', form=form, request_data=request_json)
+    else:
+        return redirect('/')
+
+@app.route('/heatmap/<state>')
+def generate_count_info(state):
+
+    offense = session['offense']
+    info = session['info']
+    scope = session['scope']
+
+    request_url = f"{api_url}{base_endpoint}{offense}/{info}/{scope}/{state}/count"
+    request = request_cache.get(request_url, headers=headers)
+
+    return jsonify(request.json())
+   
 
 
 @app.route('/agencies')
