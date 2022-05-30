@@ -2,11 +2,6 @@
 
 var totalValues = {}
 
-var svgLoadingAni = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-svgLoadingAni.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
-svgLoadingAni.setAttribute('viewBox', '0 0 200 200');
-svgLoadingAni.innerHTML = '<?xml version="1.0" encoding="utf-8"?><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="margin: auto; background: none; display: block; shape-rendering: auto;" width="150px" height="150px" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid"><path d="M10 50A40 40 0 0 0 90 50A40 43.1 0 0 1 10 50" fill="#ff9000" stroke="none"><animateTransform attributeName="transform" type="rotate" dur="0.9900990099009901s" repeatCount="indefinite" keyTimes="0;1" values="0 50 51.55;360 50 51.55"></animateTransform></path>';
-
 const loadStyle = feature => {
     return {
         fillColor: 'black',
@@ -16,19 +11,33 @@ const loadStyle = feature => {
     };
 }
 
-const populateTotalValues = async function(totalValues) {
+const findMostRecentData = data => {
+    let mostRecentYear = 0
+    let mostRecentValue 
+    for (value of data) {
+        if (value['data_year'] > mostRecentYear) {
+            mostRecentYear = value['data_year']
+        }
+    }
+    for (value of data) {
+        if (value['data_year'] === mostRecentYear) {
+            return value
+        }
+    }   
+    return 'no data'
+}
+
+const populateTotalValues = async function(totalValues, metric) {
     for (loc of locationField.children) {
         heatMapData = await fetch(`/heatmap/${loc.value}`).then(response => response.json()).then(data => {return data})
-        areaValues = heatMapData['results']
-        let mostRecentYear = 0
-        let mostRecentValue = 0
-        for (value of areaValues) {
-            if (value['data_year'] > mostRecentYear) {
-                mostRecentValue = value['incident_count']
-            }
-        }
+        data = heatMapData['results']
+        let mostRecentValue = findMostRecentData(data)
         totalValues[loc.value] = {}
-        totalValues[loc.value]['count'] = mostRecentValue
+        if (mostRecentValue[metric]) {
+            totalValues[loc.value]['count'] = mostRecentValue[metric]
+        } else {
+            totalValues[loc.value]['count'] = 'no data'
+        }
     }
     return totalValues
 }
@@ -53,7 +62,9 @@ const getColor = c => {
            c < .85  ? '#ff5000' :
            c < .9    ? '#ff4000' :
            c < .95   ? '#ff2b00' :
-                      '#ff0000';
+           c <= 1   ? '#ff0000' :
+           c == NaN ? '#00bfff' :
+                    '#000000';
 }
 
 const assignColorsObj = totalValues => {
@@ -88,9 +99,8 @@ const makeHeatMap = async function() {
         var activeLoadingAni = L.svgOverlay(svgLoadingAni, imageBounds).addTo(map);
         var activeLoadingLayer = L.geoJson(statesData, {style: loadStyle}).addTo(map); 
 
-        totalValues = await populateTotalValues(totalValues)
+        totalValues = await populateTotalValues(totalValues, 'offense_count')
         totalValues = assignColorsObj(totalValues)
-        console.log(totalValues)
 
         if (scopeField.value === 'regions') {
             mapData = regionsData
@@ -110,13 +120,60 @@ const makeHeatMap = async function() {
     }
 }
 
+var svgLoadingAni = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+svgLoadingAni.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+svgLoadingAni.setAttribute('viewBox', '0 0 200 200');
+svgLoadingAni.innerHTML = '<?xml version="1.0" encoding="utf-8"?><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="margin: auto; background: none; display: block; shape-rendering: auto;" width="150px" height="150px" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid"><path d="M10 50A40 40 0 0 0 90 50A40 43.1 0 0 1 10 50" fill="#ff9000" stroke="none"><animateTransform attributeName="transform" type="rotate" dur="0.9900990099009901s" repeatCount="indefinite" keyTimes="0;1" values="0 50 51.55;360 50 51.55"></animateTransform></path>';
+
 makeHeatMap()
 
-
-form.onsubmit = async function() {
-    ori_list = await fetch('/results').then(response => response.json()).then(data => {return data})
-    console.log(await ori_list) 
-    return await ori_list
-    console.log(ori_list)
+const formatData = data => {
+    for (value of data) {
+        console.log(value)
+    }
+    mostRecentData = findMostRecentData(data)
+    console.log(`most recent data: ${mostRecentData}`)
+    chartData = []
+    otherDataSum = 0
+    for (key of Object.keys(mostRecentData)) {
+        if (key !== 'data_year') {
+            chartData.push([key, mostRecentData[key]])
+        }
+    } 
+    chartData.push(['Other', otherDataSum])
+    return chartData       
 }
 
+const createChart = (chartData, chartTitle) => {
+    var chart = c3.generate({
+        data: {
+            columns: chartData,
+            type : 'donut',
+            onclick: function (d, i) { console.log("onclick", d, i); },
+            onmouseover: function (d, i) { console.log("onmouseover", d, i); },
+            onmouseout: function (d, i) { console.log("onmouseout", d, i); }
+        },
+        donut: {
+            title: chartTitle
+        }
+    })
+    return chart;
+}
+
+const makeChart = async function() {
+    queryData = await fetch('/chart').then(response => response.json()).then(data => {return data})
+    data = queryData['results']
+    if (!data) {
+        console.log('no data')
+    }
+    if (data) {
+        let chartData = formatData(data)
+        console.log(chartData)
+        let chartTitle = infoField.value + ' ' + offenseField.value
+        createChart(chartData, chartTitle)
+    }
+}
+
+
+
+makeChart()

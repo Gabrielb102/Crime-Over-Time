@@ -38,18 +38,7 @@ def call_api():
         session['location'] = form.location.data
         session['variable'] = form.data.data
 
-        offense = form.offense.data
-        info = form.info.data
-        scope = form.scope.data
-        location = form.location.data
-        variable = form.data.data
-
-        full_request_url = f"{api_url}{base_endpoint}{offense}/{info}/{scope}/{location}/{variable}"
-        print(full_request_url)
-        request = request_cache.get(full_request_url, headers=headers)
-        request_json = request.json
-
-        return render_template('results.html', form=form, request_data=request_json)
+        return render_template('results.html', form=form)
     else:
         return redirect('/')
 
@@ -65,6 +54,19 @@ def generate_count_info(state):
 
     return jsonify(request.json())
    
+@app.route('/chart')
+def generate_results_chart():
+
+    offense = session['offense']
+    info = session['info']
+    scope = session['scope']
+    location = session['location']
+    variable = session['variable']
+
+    full_request_url = f"{api_url}{base_endpoint}{offense}/{info}/{scope}/{location}/{variable}"
+    print(full_request_url)
+    request = request_cache.get(full_request_url, headers=headers)
+    return jsonify(request.json())
 
 
 @app.route('/agencies')

@@ -1,11 +1,11 @@
 {% extends 'base.html' %}
 {% block body %}
-<div id="content">
-    <div id="map-settings" class="content">
+<div id="content" class="content">
+    <div id="map-settings">
         <a href="/" id="button">Clear Map</a>  
     </div>
     <div id="map"></div>
-    <div id="form" class="content">
+    <div id="form">
         <form action="/results" method="POST">
             {{ form.hidden_tag() }}
     
@@ -22,11 +22,13 @@
             {% endfor %}
             <button type="submit">Submit</button>
         </form>
-    </div>
-    <div id="results">
-        <h2>RESULTS HERE!</h2>
-    </div>    
+    </div>   
 </div>
+<div id="results" class="content">
+    <h1>RESULTS HERE!</h1>
+    <div id="chart">
+    </div>
+</div> 
 {% endblock %}
 
 {% block script %}

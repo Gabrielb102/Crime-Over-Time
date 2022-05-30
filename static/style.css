@@ -51,12 +51,12 @@ a {
 
 #content {
     position: relative;
-    max-width: 800px;
 }
 
 .content {
     background-color: slategray;
     border-radius: 5px;
+    max-width: 1000px;
 }
 
 .field {

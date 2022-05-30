@@ -1,5 +1,5 @@
 const mapboxAccessToken = 'pk.eyJ1Ijoid2F4ZWQtbGVvcGFyZHMiLCJhIjoiY2wybGQxZms2MWdiZzNlc2JnOTdxeG8xOSJ9.YJVR_bne2for9zGWz2g6Gg'
-const map = L.map('map').setView([37.8, -96], 4);
+const map = L.map('map', {minZoom: 3}).setView([37.8, -96], 4);
 
 const mapSwitch = document.querySelector('#map-switch')
 const mapSettings = document.querySelector('#map-settings')
