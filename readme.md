@@ -4,6 +4,8 @@ This project utilizes the FBI's Crime Data Explorer API, which is free to the pu
 
 The home page allows you to select the information and location you would like to know about. Information can be about the Offense itself, and at a National Level and State Level. Upon submitting your query, the reports page will be loaded. On the reports page, will be a heatmap of the United States.
 
+For the maps, I used the leaflet and mapbox (upon which leaflet is dependent), which were very easy to work with. For the graphs, I used the c3 and d3 (again, a c3 dependency) which were very simple as well, and I would recommend to anyone who is looking to place interactive graphs on their website. In order to limit my API requests, I used the requests-cache package for python, and an SQLite database, and matched the expiry time with the rate at which data is updated in the CDE database. PostgreSQL would have been used for the user/favorites functionality, and the skeleton is there, although it is nonfunctional. 
+
 **Functionality**
 - Able to load a heat map based on crime frequency in the last year for any crime in the CDE API.
 - Form Fields change dynamically to automatically have the right criteria for the following fields.
