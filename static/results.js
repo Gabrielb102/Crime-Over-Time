@@ -1,6 +1,9 @@
 // I decided to have the data pruned here on the front end side in order to better manage a volume of users. 
 
 var totalValues = {}
+var centers = stateCenters
+var marker
+var popup
 
 const loadStyle = feature => {
     return {
@@ -92,6 +95,34 @@ const featureStyle = feature => {
     };
 }
 
+const showCountPopup = e => {
+    var feature = e.target;
+    var featureName = feature['feature']['properties']['name']
+    if(totalValues[featureName]) {
+        popup = L.popup()
+    .setLatLng(centers[featureName])
+    .setContent(`${featureName} Total: ${totalValues[featureName]['count']}`)
+    .openOn(map);
+    } else {
+        popup = feature.bindPopup(`No Data`);
+    }
+    if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
+        feature.bringToFront();
+    }
+    return 
+}
+
+const closePopup = e => {
+    popup.close()
+}
+
+const onEachResult = (feature, layer) => {
+    layer.on({
+        mouseover: showCountPopup,
+        mouseout: closePopup,
+    });
+}
+
 const makeHeatMap = async function() {
     if (scopeField.value === 'regions' || scopeField.value === 'states') {
         
@@ -104,9 +135,11 @@ const makeHeatMap = async function() {
 
         if (scopeField.value === 'regions') {
             mapData = regionsData
+            centers = regionCenters
         }
         if (scopeField.value === 'states') {
             mapData = statesData
+            centers = stateCenters
         }
 
         activeLoadingAni.remove()
@@ -114,8 +147,7 @@ const makeHeatMap = async function() {
 
         map.removeLayer(regionLayer)
         map.removeLayer(stateLayer)
-        var heatMapLayer = L.geoJson(mapData, {style: featureStyle}).addTo(map); 
-
+        var heatMapLayer = L.geoJson(mapData, {style: featureStyle, onEachFeature: onEachResult}).addTo(map); 
         heatMapLayer.addTo(map)
     }
 }
@@ -128,11 +160,7 @@ svgLoadingAni.innerHTML = '<?xml version="1.0" encoding="utf-8"?><svg xmlns="htt
 makeHeatMap()
 
 const formatData = data => {
-    for (value of data) {
-        console.log(value)
-    }
     mostRecentData = findMostRecentData(data)
-    console.log(`most recent data: ${mostRecentData}`)
     chartData = []
     otherDataSum = 0
     for (key of Object.keys(mostRecentData)) {
@@ -168,12 +196,9 @@ const makeChart = async function() {
     }
     if (data) {
         let chartData = formatData(data)
-        console.log(chartData)
         let chartTitle = infoField.value + ' ' + offenseField.value
         createChart(chartData, chartTitle)
     }
 }
-
-
 
 makeChart()
