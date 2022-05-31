@@ -12,12 +12,15 @@ For the maps, I used the leaflet and mapbox (upon which leaflet is dependent), w
 - Offense Data is sorted into a pie chart for the most recent year and the requested state. 
 
 **Missing Functionality that was Originally Planned**
-- Able to load Victims demographic data on the heat map and graph.
-- Data exportable as excel or csv.
-- Categories with no data are excluded from form drop-downs or explained on the page.
-- The pie chart lumps small data into an 'other' category to be more easily read.
-- Graph and heat map can be adjusted with a time slider to load historical data. ( This is the original inspiration for the "Crime Over Time" Title. 
-- Accounts can be made to save your favorite queries.
+- Able to load Victims demographic data on the heat map and graph. (half there)
+- Data exportable as excel or csv. (not started)
+- Categories with no data are excluded from form drop-downs or explained on the page. (not started)
+- The pie chart lumps small data into an 'other' category to be more easily read. (not started)
+- Graph and heat map can be adjusted with a time slider to load historical data. ( This is the original inspiration for the "Crime Over Time" Title. (not started)
+- Accounts can be made to save your favorite queries. (half there)
+- Verbal cues for UX (not started)
+- A good title for each graph (half there)
+- Agency Level data (half there)
 
 **Bugs**
 - The "variable" form field fails when on the results page
