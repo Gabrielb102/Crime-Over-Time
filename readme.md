@@ -21,12 +21,13 @@ For the maps, I used the leaflet and mapbox (upon which leaflet is dependent), w
 - Verbal cues for UX (not started)
 - A good title for each graph (half there)
 - Agency Level data (half there)
+- TESTING, no tests were written
 
 **Bugs**
 - The "variable" form field fails when on the results page
 
 *If I were to do this project again:* 
-I would list the features of the website and organize them in groups which can easily be implemented together, and tiers of priority. This way I would have been able to work in levels of priority, and had a presentable, complete product at each stage, although with less features. This way there would be no incomplete, or half built features on the page, like the login feature.
+I would list the features of the website and organize them in groups which can easily be implemented together, and tiers of priority. This way I would have been able to work in levels of priority, and had a presentable, complete product at each stage, although with less features. This way there would be no incomplete, half built, or untested features on the page, like the login feature.
 
 I would also have written the Readme file at the beginning so that I could use it to keep track of what has been done and what is left to do. The readme could be used to maintain the organizational structure detailed above, and be used to follow along with the changes in each commit.
 **
